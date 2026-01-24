@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user
+  namespace: roboshop
+  labels: # these labels belong to deployment
+    app: user
+    tier: app
+    project: roboshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels: # these labels should match with pod
+      app: user
+      tier: app
+      project: roboshop
+  template: # this is the pod definition
+    metadata:
+      labels:
+        app: user
+        tier: app
+        project: roboshop
+    spec:
+      containers:
+      - name: user
+        image: "joindevops/user:{{ .Values.deployment.imageVersion }}"
+        resources:
+          cpu: "50m"
+          memory: "68Mi"
+        limits:
+          cpu: "100m"
+          memory: "128Mi"
+        envFrom:
+        - configMapRef:
+            name: user
