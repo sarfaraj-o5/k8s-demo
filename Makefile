@@ -5,3 +5,4 @@ install-hooks:
 	@echo "Hooks installed to .git/hooks"
 
 ## make install-hooks ## installs and chmod +x
+## chmod +x .git/hooks/*
