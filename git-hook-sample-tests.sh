@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-## minimum word count check ##
+## minimum word count check ## ALL EXAMPLES FOR COMMIT MSG HOOK
 
 msg=$(cat "$1")
 word_count=$(echo "$msg" | wc -w)
