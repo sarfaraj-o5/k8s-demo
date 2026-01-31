@@ -1,6 +1,6 @@
 def call(Map configMap){
     // mapName.get("key-name")
-    def component+ = configMap.get("component")
+    def component = configMap.get("component")
     echo "component is : $component"
     pipeline {
         agent { node { label 'AGENT-1'} }

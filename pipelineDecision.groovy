@@ -15,6 +15,9 @@ def decidePipeline(Map configMap){
         case 'JavaVM':
             JavaVMCI(configMap)
             break
+        case 'javaEKS':
+            javaEKS(configMap)
+            break
         default:
             error "Unrecongnised application"
             break
