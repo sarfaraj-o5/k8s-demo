@@ -1,0 +1,234 @@
+### restrict Pods and containers to use limited host resource
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resource
+spec: 
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      requests: ## request is a soft rule
+        memory: "64Mi"
+        cpu: "250m"
+      limits:  ## limits is hard rule
+        memory: "1"
+        cpu: "500m"
+---
+### restrict Pods if engineer forgets to add in Pod defn 
+apiVersion: v1
+kind: LimitRange ## we can use this 
+metadata:
+  name: cpu-resource-constraint
+spec:
+  limits:
+  - default: ## this section defines default limits
+      cpu: 500m
+    defaultRequest: ## this section defines default requests
+      cpu: 500m
+    max: ## max and min defines the limit range
+      cpu: "1"
+    min: 
+      cpu: 100m
+    type: Container  
+
+---
+
+### how to configure health check in Pod
+### using liveness and readiness probe
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: goproxy
+  labels:
+    app: goproxy
+spec:
+  containers:
+  - name: goproxy
+    image: registry.k8s.io/goproxy:v1
+    ports:
+    - containerPort: 8080
+    readinessProbe: ## check app is ready to accept traffic or not
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 5 ##  it'll be silent for 5 sec
+      periodSeconds: 10 ## then it'll check every 10 sec until ready
+    livenessProbe: ## check app is app running properly or not
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 15 ##  it'll be silent for 15 sec
+      periodSeconds: 20 ## until pod alive it checks every 20 sec
+
+---
+## how you provide env vars in Pods in better way
+## with the help of ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-config 
+data:
+  test: docker
+  duration: 30hr
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  config-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    envFrom:
+      - ConfigMapRef: 
+          name: test-config
+---
+
+### Secrets in k8s
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+type: Opaque
+data:
+  username: flsdfjioe
+  password: fiejonf
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  secret-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    envFrom:
+      - secretRef: 
+          name: mysecret
+
+---
+
+### service in k8s --> ClusterIP, NodePort and Load Balancer
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    server: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+---
+apiVersion: v1
+kind: Service 
+metadata: 
+  name: nginx-service
+spec: ## by default ClusterIP
+  selector:
+    server: nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+
+### ReplicaSet
+
+apiVersion: v1
+kind: ReplicaSet
+metadata:
+  name: nginx
+  labels: ## these are labels related to replicaSet resource
+    app: nginx
+    tier: frontend 
+spec: 
+  ## modify replicas according to your case
+  replicas: 3
+  selector:
+    matchLabels: ## this is the syntax replica uses to find the pods
+      tier: frontend
+  template: ## pod template, labels are related to pods
+    metadata: 
+      labels:
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+---
+
+## Deployment
+
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: nginx-deployment 
+  annotations:
+    deployment.kubernetes.io/change-cause: "Upgraded to version 2.0"
+  labels:
+    app: nginx
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: nginx
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 2 ## we asked for 10, we are OK if 9 are running at the time of upgrade
+      maxSurge: 2 ## we asked for 10, we are OK at the time of upgrade 11 are running
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers: 
+      - name: nginx
+        image: nginx:1.22.1
+        ports:
+        - containerPort: 80
+---
+
+### DaemonSet
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd-elasticsearch
+  namespace: kube-system
+  labels:
+    k8s-app: fluentd-logging
+spec:
+  selector:
+    matchLabels:
+      name: fluentd-elasticsearch
+  template:
+    metadata:
+      labels:
+        name: fluentd-elasticsearch
+    spec:
+      containers:
+      - name: fluentd-elasticsearch
+        image: quay.io/fluentd_elasticsearch/fluentd:v2.5.2
+        resources:
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log 
+      volumes:
+      - name: varlog
+        hostPath:
+          path: /var/log
