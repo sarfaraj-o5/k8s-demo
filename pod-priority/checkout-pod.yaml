@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: checkout-pod 
+  labels:
+    app: checkout
+spec:
+  priorityClassName: high-priority
+  containers:
+  - name: checkout-container
+    image: nginx:checkout

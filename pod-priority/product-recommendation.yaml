@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: product-rec-pod 
+  labels:
+    app: product-recommendations
+spec:
+  priorityClassName: medium-priority
+  containers:
+  - name: product-rec-container
+    image: nginx:store

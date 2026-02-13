@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: shopping-cart-pod 
+  labels:
+    app: shopping-cart-pod
+spec:
+  priorityClassName: low-priority
+  containers:
+  - name: shopping-cart-container
+    image: nginx:cart
