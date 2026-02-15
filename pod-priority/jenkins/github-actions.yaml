@@ -1,0 +1,11 @@
+- name: Automated Version Bump
+  id: version-bump
+  uses: 'phips28/gh-action-bump-version@9.0.16'
+  env:
+    GITHUB_TOKEN: ${{ secret.GITHUB_TOKEN }}
+  with:
+    commit-message: 'CI: Bump version to v{{version}}'
+
+---
+
+
