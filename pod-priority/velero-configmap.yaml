@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  # managed-premium: premium-ssd-v2
+  older storage_class name : new storage_class name
+kind: ConfigMap
+metadata:
+  labels:
+    velero.io/change-storage-class: RestoreItemAction
+    velero.io/plugin-config: ""
+  name: storage-class-config
+  namespace: velero

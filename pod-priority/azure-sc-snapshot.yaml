@@ -1,0 +1,8 @@
+apiVersion: storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: disk-snapshot-class 
+driver: disk.csi.azure.com
+deletionPolicy: Delete
+parameters:
+  incremental: "false"
