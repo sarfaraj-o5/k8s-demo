@@ -9,3 +9,4 @@ managedNodeGroups:
   spot: true
 
 ## eksctl create cluster -f eksctl-config.yaml
+## kubectl get nodes
