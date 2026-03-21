@@ -1,0 +1,11 @@
+kind: ClusterConfig
+metadata:
+  name: eks-cluster-spot
+  region: ap-south-1
+
+managedNodeGroups:
+- name: spot
+  instanceType: ["c2.large", "c4.large", "c5.large"]
+  spot: true
+
+## eksctl create cluster -f eksctl-config.yaml
